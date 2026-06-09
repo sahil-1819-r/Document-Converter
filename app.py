@@ -4,6 +4,10 @@ from pdf2image import convert_from_bytes
 from io import BytesIO
 import pytesseract
 from PIL import Image
+import tempfile
+import subprocess
+import os
+from pdf2docx import Converter
 
 
 st.title("Document Converter")
@@ -131,3 +135,97 @@ if pdf_ocr_file is not None:
             file_name="pdf_extracted_text.txt",
             mime="text/plain"
         )  
+        
+        
+# DOCX To PDF Conversion
+
+st.header("DOCX to PDF Converter")
+
+docx_file = st.file_uploader(
+    "Upload DOCX",
+    type=["docx"],
+    key="docx_uploader"
+)
+
+if docx_file is not None:
+
+    if st.button("Convert DOCX to PDF"):
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+
+            docx_path = os.path.join(temp_dir, "input.docx")
+
+            with open(docx_path, "wb") as f:
+                f.write(docx_file.getbuffer())
+
+            subprocess.run(
+                [
+                    "libreoffice",
+                    "--headless",
+                    "--convert-to",
+                    "pdf",
+                    docx_path,
+                    "--outdir",
+                    temp_dir
+                ],
+                check=True
+            )
+
+            pdf_path = os.path.join(temp_dir, "input.pdf")
+
+            with open(pdf_path, "rb") as pdf_file:
+                pdf_bytes = pdf_file.read()
+
+            st.success("PDF Created Successfully! ✅")
+
+            downloaded_docx_pdf = st.download_button(
+                "Download PDF",
+                data=pdf_bytes,
+                file_name="converted.pdf",
+                mime="application/pdf"
+            )
+
+            if downloaded_docx_pdf:
+                st.success("Downloaded Successfully! ✅")
+                
+# PDF To DOCX Conversion 
+
+st.header("PDF to DOCX Converter")
+
+pdf_docx_file = st.file_uploader(
+    "Upload PDF",
+    type=["pdf"],
+    key="pdf_docx_uploader"
+)
+
+if pdf_docx_file is not None:
+
+    if st.button("Convert PDF to DOCX"):
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+
+            pdf_path = os.path.join(temp_dir, "input.pdf")
+
+            with open(pdf_path, "wb") as f:
+                f.write(pdf_docx_file.getbuffer())
+
+            docx_path = os.path.join(temp_dir, "output.docx")
+
+            cv = Converter(pdf_path)
+            cv.convert(docx_path)
+            cv.close()
+
+            with open(docx_path, "rb") as docx_file:
+                docx_bytes = docx_file.read()
+
+            st.success("DOCX Created Successfully! ✅")
+
+            downloaded_pdf_docx = st.download_button(
+                "Download DOCX",
+                data=docx_bytes,
+                file_name="converted.docx",
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+
+            if downloaded_pdf_docx:
+                st.success("Downloaded Successfully! ✅")
