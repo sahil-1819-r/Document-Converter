@@ -329,6 +329,11 @@ def render_image_to_pdf() -> None:
     if uploaded_file is not None:
         st.image(uploaded_file, caption="Uploaded Image", use_container_width=True)
 
+        st.markdown(
+            '<div class="converter-action"></div>',
+            unsafe_allow_html=True
+        )
+        
         if st.button("Convert to PDF", type="primary"):
             pdf_bytes = img2pdf.convert(uploaded_file.getvalue())
             st.download_button(
@@ -376,6 +381,10 @@ def render_image_ocr() -> None:
         image = Image.open(ocr_file)
         st.image(image, caption="Uploaded Image", use_container_width=True)
 
+        st.markdown(
+            '<div class="converter-action"></div>',
+            unsafe_allow_html=True
+        )
         if st.button("Extract Text", type="primary"):
             extracted_text = pytesseract.image_to_string(image)
             st.success("Text Extracted Successfully! ✅")
@@ -398,6 +407,12 @@ def render_pdf_ocr() -> None:
     render_file_info(pdf_ocr_file)
 
     if pdf_ocr_file is not None:
+        
+        st.markdown(
+            '<div class="converter-action"></div>',
+            unsafe_allow_html=True
+        )
+        
         if st.button("Extract Text from PDF", type="primary"):
             pages = convert_from_bytes(pdf_ocr_file.read())
             extracted_text = ""
@@ -431,6 +446,11 @@ def render_docx_to_pdf() -> None:
     render_file_info(docx_file)
 
     if docx_file is not None:
+        
+        st.markdown(
+            '<div class="converter-action"></div>',
+            unsafe_allow_html=True
+        )
         if st.button("Convert DOCX to PDF", type="primary"):
             with tempfile.TemporaryDirectory() as temp_dir:
                 docx_path = os.path.join(temp_dir, "input.docx")
@@ -476,6 +496,11 @@ def render_pdf_to_docx() -> None:
     render_file_info(pdf_docx_file)
 
     if pdf_docx_file is not None:
+        
+        st.markdown(
+            '<div class="converter-action"></div>',
+            unsafe_allow_html=True
+        )
         if st.button("Convert PDF to DOCX", type="primary"):
             with tempfile.TemporaryDirectory() as temp_dir:
                 pdf_path = os.path.join(temp_dir, "input.pdf")
